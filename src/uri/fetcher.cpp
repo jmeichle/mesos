@@ -56,6 +56,8 @@ Try<Owned<Fetcher>> create(const Option<Flags>& _flags)
        [flags]() { return HadoopFetcherPlugin::create(flags); }},
     {DockerFetcherPlugin::NAME,
        [flags]() { return DockerFetcherPlugin::create(flags); }},
+    {AwsFetcherPlugin::NAME,
+       [flags]() { return AwsFetcherPlugin::create(flags); }},
 #endif // __WINDOWS__
   };
 

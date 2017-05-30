@@ -14,50 +14,43 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef __URI_FETCHER_HPP__
-#define __URI_FETCHER_HPP__
+#ifndef __URI_FETCHERS_CURL_HPP__
+#define __URI_FETCHERS_CURL_HPP__
 
 #include <process/owned.hpp>
 
-#include <stout/none.hpp>
-#include <stout/option.hpp>
+#include <stout/flags.hpp>
 #include <stout/try.hpp>
 
 #include <mesos/uri/fetcher.hpp>
 
-#include "uri/fetchers/aws.hpp"
-#include "uri/fetchers/copy.hpp"
-#include "uri/fetchers/curl.hpp"
-#include "uri/fetchers/docker.hpp"
-#include "uri/fetchers/hadoop.hpp"
-
 namespace mesos {
 namespace uri {
-namespace fetcher {
 
-/**
- * The combined flags for all built-in plugins.
- */
-class Flags :
-  public virtual CopyFetcherPlugin::Flags,
-#ifdef __WINDOWS__
-  // TODO(dpravat): Add support for Hadoop and Docker plugins. See MESOS-5473.
-  public virtual CurlFetcherPlugin::Flags {};
-#else
-  public virtual CurlFetcherPlugin::Flags,
-  public virtual HadoopFetcherPlugin::Flags,
-  public virtual DockerFetcherPlugin::Flags {};
-  public virtual AwsFetcherPlugin::Flags {};
-#endif // __WINDOWS__
+class AwsFetcherPlugin : public Fetcher::Plugin
+{
+public:
+  class Flags : public virtual flags::FlagsBase {};
 
+  static const char NAME[];
 
-/**
- * Factory method for creating a Fetcher instance.
- */
-Try<process::Owned<Fetcher>> create(const Option<Flags>& flags = None());
+  static Try<process::Owned<Fetcher::Plugin>> create(const Flags& flags);
 
-} // namespace fetcher {
+  virtual ~AwsFetcherPlugin() {}
+
+  virtual std::set<std::string> schemes() const;
+
+  virtual std::string name() const;
+
+  virtual process::Future<Nothing> fetch(
+      const URI& uri,
+      const std::string& directory) const;
+
+private:
+  AwsFetcherPlugin() {}
+};
+
 } // namespace uri {
 } // namespace mesos {
 
-#endif // __URI_FETCHER_HPP__
+#endif // __URI_FETCHERS_CURL_HPP__
